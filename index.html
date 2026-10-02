@@ -371,7 +371,7 @@ let G;
 function reset() { G = { ep: 0, i: 0, score: 0, essais: 0, max: 0, epPts: 0, epMax: 0, jokers: { fifty: 1, ami: 1 }, t0: 0, answered: false, wheelRot: 0, usedGages: new Set() }; }
 // Tire un gage jamais sorti pendant cette partie (le paquet ne se remélange que s’il est épuisé).
 function drawGage(p, others) {
-  if (p === 'Yvain' && !G.usedGages.has(YVAIN_GAGE)) { G.usedGages.add(YVAIN_GAGE); return YVAIN_GAGE; }
+  if (p === 'Yvain' && !G.usedGages.has(YVAIN_GAGE) && Math.random() < .5) { G.usedGages.add(YVAIN_GAGE); return YVAIN_GAGE; }
   let pool = GAGES.filter(g => !G.usedGages.has(g));
   if (!pool.length) { GAGES.forEach(g => G.usedGages.delete(g)); pool = GAGES.slice(); }
   const g = pick(pool); G.usedGages.add(g);
@@ -640,9 +640,7 @@ function wheel(pct) {
   $('#spin').onclick = () => {
     $('#spin').disabled = true;
     // Plus Antoine a raté l’épisode, plus la roue a tendance à le choisir.
-    // Premier tour de roue truqué : il tombe toujours sur Yvain.
-    const idx = !G.yvainDone ? PLAYERS.indexOf('Yvain') : Math.random() < (pct < .5 ? .45 : .15) ? 0 : 1 + (Math.random() * (N - 1) | 0);
-    G.yvainDone = true;
+    const idx = Math.random() < (pct < .5 ? .45 : .15) ? 0 : 1 + (Math.random() * (N - 1) | 0);
     const center = (idx + .5) * 360 / N;
     const base = Math.ceil(G.wheelRot / 360) * 360;
     G.wheelRot = base + 360 * 5 + (360 - center) + (Math.random() * 20 - 10);
